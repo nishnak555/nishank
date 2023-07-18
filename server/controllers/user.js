@@ -17,9 +17,11 @@ const SignupController = async (req, res) => {
     gender,
     MobileNumber,
     DateOfBirth,
+    isAdmin
   } = req.body;
+  console.log(req.body)
   try {
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email ,isAdmin});
     if (existingUser) {
       return res.status(400).json({ message: "Email already exists" });
     }
@@ -37,6 +39,8 @@ const SignupController = async (req, res) => {
       gender,
       MobileNumber,
       DateOfBirth,
+      isAdmin
+      
     });
 
     await newuser.save();
@@ -54,14 +58,15 @@ const loginController = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error("Email not found");
+      return res.status(400).json({message:"user not found"})
+      // throw new Error("Email not found");
     }
     const isPasswordMacth = await bcrypt.compare(password, user.password);
     if (!isPasswordMacth) {
       throw new Error("Invalid password");
     }
 
-    const auth = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const auth = jwt.sign({ id: user._id ,isAdmin: user.isAdmin }, process.env.JWT_SECRET, {
       expiresIn: "3d",
     });
     res.cookie("auth", auth, {

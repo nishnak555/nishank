@@ -29,7 +29,7 @@ googleId:{
 },
 isAdmin:{
   type:Boolean,
-  default:false
+  // default:false
 },
 
     Otp: {
