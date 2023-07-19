@@ -18,12 +18,13 @@ const SignupController = async (req, res) => {
     MobileNumber,
     DateOfBirth,
     isAdmin
+    
   } = req.body;
   console.log(req.body)
   try {
-    const existingUser = await User.findOne({ email ,isAdmin});
+    const existingUser = await User.findOne({ email,isAdmin });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(400).json({ message: "Email  already exists" });
     }
     if (email === " " || password === "" || Username === "") {
       return res
@@ -41,6 +42,7 @@ const SignupController = async (req, res) => {
       DateOfBirth,
       isAdmin
       
+      
     });
 
     await newuser.save();
@@ -54,25 +56,47 @@ const SignupController = async (req, res) => {
 // Login Controller
 
 const loginController = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password,isAdmin } = req.body;
+  console.log(req.body)
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne( 
+    { $and: [{ email: email }, { isAdmin: isAdmin }] }, // Regular user conditions
+    // Admin conditions
+  
+);
     if (!user) {
       return res.status(400).json({message:"user not found"})
       // throw new Error("Email not found");
     }
+    console.log(user.isAdmin)
     const isPasswordMacth = await bcrypt.compare(password, user.password);
     if (!isPasswordMacth) {
       throw new Error("Invalid password");
     }
-
-    const auth = jwt.sign({ id: user._id ,isAdmin: user.isAdmin }, process.env.JWT_SECRET, {
-      expiresIn: "3d",
-    });
-    res.cookie("auth", auth, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
+if (user.isAdmin===true) {
+  const auth = jwt.sign({ id: user._id ,isAdmin: true }, process.env.JWT_SECRET, {
+    expiresIn: "3d",
+  });
+  res.cookie("auth", auth, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  });
+} else {
+  const auth = jwt.sign({ id: user._id ,isAdmin: false }, process.env.JWT_SECRET, {
+    expiresIn: "3d",
+  });
+  res.cookie("auth", auth, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+  });
+}
+    // const auth = jwt.sign({ id: user._id ,isAdmin: user.isAdmin }, process.env.JWT_SECRET, {
+    //   expiresIn: "3d",
+    // });
+    // res.cookie("auth", auth, {
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    //   httpOnly: true,
+    // });
     return res.json({ message: "Login Successful" });
   } catch (error) {
     console.error("Login error:", error);

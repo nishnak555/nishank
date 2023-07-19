@@ -30,6 +30,7 @@ googleId:{
 isAdmin:{
   type:Boolean,
   // default:false
+  required:true
 },
 
     Otp: {
