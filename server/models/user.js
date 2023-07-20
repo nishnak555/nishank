@@ -27,11 +27,7 @@ type:String
 googleId:{
   type:String
 },
-isAdmin:{
-  type:Boolean,
-  // default:false
-  required:true
-},
+
 
     Otp: {
       type: Number,
