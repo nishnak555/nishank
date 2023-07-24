@@ -16,6 +16,7 @@ router.put("/:id",verifyTokenandAuthorization,Controller.UpdateController)
 
 //Delete
 router.delete("/:id",verifyTokenandAuthorization,Controller.DeleteUser)
-
+// get user
+router.get("/profile/:id",verifyTokenandAuthorization,Controller.GetUser)
 
 module.exports = router
