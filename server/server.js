@@ -53,6 +53,7 @@ app.get(
 //routes
 app.use("/api/user", UserRoute);
 
-app.listen(process.env.PORT||6000,()=>{
- console.log("App is running on port 6000..")
+app.listen(process.env.PORT||5000,()=>{
+ console.log("App is running on port 5000..")
 })
+module.exports =  app

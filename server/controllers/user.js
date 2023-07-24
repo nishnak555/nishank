@@ -17,17 +17,21 @@ const SignupController = async (req, res) => {
     gender,
     MobileNumber,
     DateOfBirth,
+    
+    
   } = req.body;
+  console.log(req.body)
+      if (email === " " || password === "" || Username === "") {
+        return res
+          .status(400)
+          .json({ message: "email,password and username required" });
+      }
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(404).json({ message: "Email  already exists" });
     }
-    if (email === " " || password === "" || Username === "") {
-      return res
-        .status(400)
-        .json({ message: "email,password and username required" });
-    }
+
     const hashedpassword = await bcrypt.hash(password, 10);
     const newuser = new User({
       password: hashedpassword,
@@ -37,6 +41,9 @@ const SignupController = async (req, res) => {
       gender,
       MobileNumber,
       DateOfBirth,
+      
+      
+      
     });
 
     await newuser.save();
@@ -50,28 +57,36 @@ const SignupController = async (req, res) => {
 // Login Controller
 
 const loginController = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password} = req.body;
+  console.log(req.body)
+      if (email === " " || password === "") {
+        return res.status(400).json({ message: "email,password  required" });
+      }
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({email}  
+);
     if (!user) {
-      throw new Error("Email not found");
+      return res.status(404).json({message:"user not found"})
+      // throw new Error("Email not found");
     }
+ 
     const isPasswordMacth = await bcrypt.compare(password, user.password);
     if (!isPasswordMacth) {
-      throw new Error("Invalid password");
+      return res.status(401).json({message:"unauthorized"})
     }
 
-    const auth = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    const auth = jwt.sign({ id:user._id,userName:user.Username}, process.env.JWT_SECRET, {
       expiresIn: "3d",
     });
+    
     res.cookie("auth", auth, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    return res.json({ message: "Login Successful" });
+    return res.json({ success: true,username:user.Username });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(400).json({ message: "Invalid email or password" });
+    res.status(500).json({ message: "internal server error" });
   }
 };
 
@@ -93,6 +108,15 @@ const UpdateController = async (req, res) => {
     res.status(500).json(error);
   }
 };
+// get user data
+const GetUser =  async (req,res)=>{
+  try {
+    const user =  await User.findById(req.params.id)
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(500).json(error)
+  }
+}
 
 // Delete User
 const DeleteUser = async (req, res) => {
@@ -161,5 +185,8 @@ module.exports = {
   UpdateController,
   DeleteUser,
   LogoutUser,
+  GetUser
 
 };
+
+
