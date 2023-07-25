@@ -32,9 +32,9 @@ const SignupController = async (req, res) => {
       return res.status(404).json({ message: "Email  already exists" });
     }
 
-    const hashedpassword = await bcrypt.hash(password, 10);
+    // const hashedpassword = await bcrypt.hash(password, 10);
     const newuser = new User({
-      password: hashedpassword,
+      password,
       email,
       Username,
       Address,
@@ -57,6 +57,7 @@ const SignupController = async (req, res) => {
 // Login Controller
 
 const loginController = async (req, res) => {
+  
   const { email, password} = req.body;
   console.log(req.body)
       if (email === " " || password === "") {
@@ -83,7 +84,7 @@ const loginController = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
-    return res.json({ success: true,username:user.Username });
+     res.json({ success: true,username:user.Username });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "internal server error" });

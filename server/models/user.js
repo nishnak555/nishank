@@ -5,10 +5,17 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      validate:{
+      validator:function (email){
+        return /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
+      },
+      message:'Invalid email format'
+      }
     },
     password: {
       type: String,
       required: true,
+    
     },
     gender: {
       type: String,

@@ -2,6 +2,7 @@ const express =  require("express")
 const app = express()
 const dotenv =  require("dotenv")
 const cors =  require("cors")
+const morgan  =  require("morgan")
 dotenv.config()
 const cookieParser =  require("cookie-parser")
 
@@ -51,9 +52,11 @@ app.get(
 
 
 //routes
+app.use(morgan("combined"));
 app.use("/api/user", UserRoute);
 
 app.listen(process.env.PORT||5000,()=>{
+  
  console.log("App is running on port 5000..")
 })
 module.exports =  app
